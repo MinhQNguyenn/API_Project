@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,6 +22,10 @@ public class Wishlist {
     private String name;
     private String detail;
     private boolean status = false;
+    private int mode;
+    @Nullable
+    private String note;
+
     @ManyToOne
     @JoinColumn(name = "AccountId")
     private Account AccountId;

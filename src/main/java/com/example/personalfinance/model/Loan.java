@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -24,6 +25,9 @@ public class Loan {
     private Date dataOfLoan;
     private Date deadline;
     private String loaner;
+    private int mode;
+    @Nullable
+    private String note;
 
     @ManyToOne
     @JoinColumn(name="AccountId")

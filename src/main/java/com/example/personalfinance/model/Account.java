@@ -11,7 +11,7 @@ import java.util.Collection;
 @Getter
 @Setter
 @AllArgsConstructor
-@Table(name="user")
+@Table(name="Account")
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,17 +19,18 @@ public class Account {
     private String name;
     private String email;
     private String password;
+    private int mode;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name="user_Roles",
-            joinColumns = @JoinColumn(
-                    name="user_id", referencedColumnName="id"),
-            inverseJoinColumns = @JoinColumn(
-                    name ="role_id",referencedColumnName="id")
-            )
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinTable(
+//            name="user_Roles",
+//            joinColumns = @JoinColumn(
+//                    name="user_id", referencedColumnName="id"),
+//            inverseJoinColumns = @JoinColumn(
+//                    name ="role_id",referencedColumnName="id")
+//            )
 
-    private Collection<Account_Roles> Roles;
+//    private Collection<Account_Roles> Roles;
 
     public Account() {
     }
