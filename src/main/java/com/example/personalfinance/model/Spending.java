@@ -1,6 +1,5 @@
 package com.example.personalfinance.model;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,5 +31,15 @@ public class Spending {
 
     public Spending() {
 
+    }
+
+    public Spending(int id, int amount, String name, Date dateOfSpending, String detail, int mode, @Nullable String note) {
+        this.id = id;
+        this.amount = amount;
+        this.name = name;
+        this.dateOfSpending = dateOfSpending;
+        this.detail = detail;
+        this.mode = mode;
+        this.note = note;
     }
 }

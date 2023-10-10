@@ -27,6 +27,5 @@ public class Budget {
     private Saving saving;
 
     public Budget() {
-
     }
 }

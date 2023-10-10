@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html
+        xmlns:th="https://www.thymeleaf.org"
         lang="en"
         class="light-style customizer-hide"
         dir="ltr"
@@ -49,70 +50,14 @@
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="assets/js/config.js"></script>
-    <script>
-        var currentPage = 1;
-        var totalPages = 1;
-
-        $(document).ready(function () {
-            $("#txtSearch").on("keyup", function () {
-                var txtSearch = $(this).val();
-                currentPage = 1;
-                performSearch(txtSearch, currentPage);
-            });
-
-            $("#categorySelect").change(function () {
-                var txtSearch = $("#txtSearch").val();
-                var category = $(this).val();
-                currentPage = 1;
-                performSearch(txtSearch, currentPage, category);
-            });
-        });
-
-        function goToPage(pageNumber) {
-            var txtSearch = $("#txtSearch").val();
-            currentPage = pageNumber;
-            performSearch(txtSearch, currentPage);
-        }
-
-        function performSearch(txtSearch, pageNumber, category) {
-            $.ajax({
-                url: "saleSearch",
-                type: "get",
-                data: {
-                    txt: txtSearch,
-                    page: pageNumber,
-                    category: category,
-                    mode: 0
-                },
-                success: function (data) {
-                    var response = data; // No need for JSON.parse()
-                    var row = document.getElementById("tableContent");
-                    row.innerHTML = response.tableRows;
-
-                    var totalPages = response.totalPages;
-
-                },
-                error: function (xhr) {
-                    console.log(xhr);
-                }
-            });
-        }
-    </script>
 </head>
 <body>
-<c:if test="${not empty accessError}">
-    <script>
-        window.addEventListener("load", function () {
-            alert("${accessError}");
-        };
-    </script>
-</c:if>
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
         <!-- Menu -->
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
             <div class="app-brand demo">
-                <a href="general" class="app-brand-link">
+                <a href="/spending" class="app-brand-link">
                             <span class="app-brand-logo demo">
                                 <svg
                                         width="25"
@@ -150,7 +95,7 @@
                                 </g>
                                 </svg>
                             </span>
-                    <span class="app-brand-text menu-text fw-bolder" style="border-width:1px; border-style:solid; border-color:#696cff; padding: 5px; font-family: 'Mukta';color: #696cff; font-weight: 50; font-size: 25px"> GAS VIETNAM </span>
+                    <span class="app-brand-text menu-text fw-bolder" style="border-width:1px; border-style:solid; border-color:#696cff; padding: 5px; font-family: 'Mukta';color: #696cff; font-weight: 50; font-size: 25px"> PERSONAL FINANCE </span>
                 </a>
 
                 <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -161,57 +106,43 @@
             <div class="menu-inner-shadow"></div>
 
             <ul class="menu-inner py-1">
-                <!-- General -->
+                <!-- Spending -->
                 <li class="menu-item active">
-                    <a href="general" class="menu-link">
+                    <a th:href="@{/spending}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                        <div data-i18n="Analytics">General</div>
+                        <div data-i18n="Analytics">Spending</div>
                     </a>
                 </li>
 
 
-                <!-- Management -->
+                <!-- Loan -->
                 <li class="menu-header small text-uppercase"><span class="menu-header-text">Management</span></li>
-                <!-- Product -->
+                <!-- Loan -->
                 <li class="menu-item">
-                    <a href="productInfo" class="menu-link">
+                    <a th:href="@{/loan}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-collection"></i>
-                        <div data-i18n="Basic">Product</div>
+                        <div data-i18n="Basic">Loan</div>
                     </a>
                 </li>
-                <!-- Customer -->
+                <!-- Wishlist -->
                 <li class="menu-item">
-                    <a href="customerInfo" class="menu-link">
+                    <a th:href="@{/wishlist}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-group"></i>
-                        <div data-i18n="Basic">Customer</div>
+                        <div data-i18n="Basic">Wishlist</div>
                     </a>
                 </li>
-                <!-- Coupon -->
+                <!-- Saving -->
                 <li class="menu-item">
-                    <a href="coupon_admin" class="menu-link active">
+                    <a th:href="@{/saving}" class="menu-link active">
                         <i class="menu-icon tf-icons bx bxs-discount"></i>
-                        <div data-i18n="Basic">Coupon</div>
+                        <div data-i18n="Basic">Saving</div>
                     </a>
                 </li>
-                <!-- News -->
+                <!-- Budget -->
                 <li class="menu-item">
-                    <a href="productInfo" class="menu-link">
+                    <a th:href="@{/budget}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-news"></i>
-                        <div data-i18n="Basic">News</div>
-                    </a>
-                </li>
-                <!--Navigation-->
-                <li class="menu-item">
-                    <a href="HFM" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-list-ul"></i>
-                        <div data-i18n="Basic">Navigation Manager</div>
-                    </a>
-                </li>
-                <!-- Employee -->
-                <li class="menu-item">
-                    <a href="employee" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-list-ul"></i>
-                        <div data-i18n="Basic">Employee</div>
+                        <div data-i18n="Basic">Budget</div>
                     </a>
                 </li>
             </ul>
@@ -261,7 +192,7 @@
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <span class="fw-semibold d-block">${sessionScope['name']}</span>
+                                                <span class="fw-semibold d-block">Name</span>
                                                 <small class="text-muted">Admin</small>
                                             </div>
                                         </div>
@@ -308,19 +239,19 @@
                             <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                                 <i class='bx bxs-bar-chart-square bx-flip-horizontal bx-lg' ></i>
                                 <div class="ms-3">
-                                    <p class="mb-2">Today Sale</p>
-                                    <h6 class="mb-0">${today} VND</h6>
+                                    <p class="mb-2">This Month Budget</p>
+                                    <h6 class="mb-0" th:text="${m_budget}"></h6>
                                 </div>
                             </div>
                         </a>
                     </div>
                     <div class="col-sm-6 col-xl-3">
-                        <a href="saleRedirect?mode=1">
+                        <a th:href="@{/spending}">
                             <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                                 <i class='bx bx-line-chart bx-lg'></i>
                                 <div class="ms-3">
-                                    <p class="mb-2">Monthly Sale</p>
-                                    <h6 class="mb-0">${month} VND</h6>
+                                    <p class="mb-2">This month Spending</p>
+                                    <h6 class="mb-0" th:text="${m_spending}"></h6>
                                 </div>
                             </div>
                         </a>
@@ -330,8 +261,8 @@
                             <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                                 <i class='bx bxs-chart bx-lg'></i>
                                 <div class="ms-3">
-                                    <p class="mb-2">Last year sale</p>
-                                    <h6 class="mb-0">${lastYear} VND</h6>
+                                    <p class="mb-2">This Month Saving</p>
+                                    <h6 class="mb-0" th:text="${m_saving}"></h6>
                                 </div>
                             </div>
                         </a>
@@ -341,8 +272,8 @@
                             <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                                 <i class='bx bxs-pie-chart-alt-2 bx-lg'></i>
                                 <div class="ms-3">
-                                    <p class="mb-2">Yearly Sale</p>
-                                    <h6 class="mb-0">${year} VND</h6>
+                                    <p class="mb-2">Total Saving</p>
+                                    <h6 class="mb-0" th:text="${totalSaving}"></h6>
                                 </div>
                             </div>
                         </a>
@@ -360,65 +291,30 @@
                         <h6 class="mb-0">Recent Sales</h6>
                     </div>
                     <!--Search-->
-                    <!--                            <form action="saleSearch" method="get" style="margin-left: 20px; margin-right: 20px">
-                                                    <input type="hidden" name="mode" value="0">
-                                                    <div class="mb-2 col-sm row" >
-                                                        <label for="category" class="form-label">Filter by: </label>
-                                                        <div class="col-sm-6">
-                                                            <select class="form-select" id="categorySelect" aria-label="Default select example" name="category" id="category">
-                                                                <option value="0">All</option>
-                                                                <option value="1">Customer Name</option>
-                                                                <option value="2">Order Id</option>
-                                                                <option value="3">Phone</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="col-sm-6">
-                                                            <div class="input-group input-group-merge">
-                                                                <span class="input-group-text" id="basic-addon-search31"><i class="bx bx-search"></i></span>
-                                                                <input type="text" class="form-control" name="txtSearch" placeholder="Search Order....." id="txtSearch"/>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <input type="submit" name="submitSearch" value="Search">
-                                                    </div>
-                                                </form>-->
                     <!--Search-->
                     <div id="tableContent">
                         <div class="table-responsive">
                             <table class="table text-start align-middle table-bordered table-hover mb-0">
                                 <thead>
                                 <tr class="text-dark">
-                                    <th scope="col">Order ID</th>
-                                    <th scope="col">Customer Name</th>
-                                    <th scope="col">Purchase Date</th>
-                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Detail</th>
+                                    <th scope="col">Date Of Spending</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Note</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <c:forEach items="${requestScope.orders}" var="item">
-                                    <tr>
-                                        <td>${item.getOrderID()}</td>
-                                        <td>${item.getCustomerName()}</td>
-                                        <td>${item.getPurchaseDate()}</td>
-                                        <td>VND ${item.getTotalPriceConfig()}</td>
-                                        <td><a class="btn btn-sm btn-primary" href="saleRedirect?mode=9&id=${item.getOrderID()}">Details</a></td>
+                                    <tr th:each="spending: ${spendingList}">
+                                        <td th:text="${spending.name}"/>
+                                        <td th:text="${spending.detail}"/>
+                                        <td th:text="${spending.dateOfSpending}"/>
+                                        <td th:text="${spending.amount}"/>
+                                        <td th:text="${spending.note}"/>
                                     </tr>
-                                </c:forEach>
                                 </tbody>
                             </table>
                         </div>
-                        <div id="pagingContainer"></div>
-                        <nav aria-label="Page navigation">
-                            <ul class="pagination justify-content-center">
-                                <c:forEach begin="1" end="${endPage}" var="i">
-                                    <li class="page-item ${page==i?"active":""}">
-                                    <a class="page-link "  onclick="goToPage(${i})"
-                                    >${i}</a>
-                                    </li>
-                                </c:forEach>
-                            </ul>
-                        </nav>
                     </div>
                 </div>
             </div>

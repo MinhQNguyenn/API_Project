@@ -1,20 +1,22 @@
 package com.example.personalfinance.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class HomeController {
 
-    @GetMapping("/")
+    @GetMapping ("/login")
     public String home(){
-        return "Welcome home";
+        return "redirect:/login";
     }
-
-    @GetMapping("/secured")
-    public String secured(){
-        return "Welcome secured";
-    }
+//
+//    @GetMapping("/secured")
+//    public String secured(){
+//        return "Welcome secured";
+//    }
 
 
 }
