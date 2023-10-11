@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html
+        lang="en"
+        xmlns:th="https://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Spending List</title>
+    <style>
+        /* Inline CSS */
+        .headline {
+            text-align: center;
+            font-size: 24px;
+            padding: 10px;
+        }
+
+        .box {
+            width: 100px;
+            height: 100px;
+            background-color: #698a69;
+            margin: 10px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .table th, .table td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+<div class="headline">
+    Personal Finance Management
+</div>
+<div class="box"  >
+    <div class="ms-3">
+        <p class="mb-2">This Month Budget</p>
+        <h6 class="mb-0" th:text="${m_budget}"></h6>
+    </div>
+</div>
+<div class="box">
+    <div class="ms-3">
+        <p class="mb-2">This month Spending</p>
+        <h6 class="mb-0" th:text="${m_spending}"></h6>
+    </div>
+</div>
+<div class="box">
+    <div class="ms-3">
+        <p class="mb-2">This Month Saving</p>
+        <h6 class="mb-0" th:text="${m_saving}"></h6>
+    </div>
+</div>
+<div class="box"><div class="ms-3">
+    <p class="mb-2">Total Saving</p>
+    <h6 class="mb-0" th:text="${totalSaving}"></h6>
+</div></div>
+
+<table class="table">
+    <thead>
+    <tr class="text-dark">
+        <th scope="col">Name</th>
+        <th scope="col">Detail</th>
+        <th scope="col">Date Of Spending</th>
+        <th scope="col">Price</th>
+        <th scope="col">Note</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="spending: ${spendingList}">
+        <td th:text="${spending.name}"/>
+        <td th:text="${spending.detail}"/>
+        <td th:text="${spending.dateOfSpending}"/>
+        <td th:text="${spending.amount}"/>
+        <td th:text="${spending.note}"/>
+    </tr>
+    </tbody>
+</table>
+
+<script>
+    // Inline JavaScript
+    // You can add your custom JavaScript code here
+</script>
+</body>
+</html>

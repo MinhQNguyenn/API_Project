@@ -23,6 +23,9 @@ spring:
     jpa:
       repositories:
         base-package: com.example.myproject.Class
+  thymeleaf:
+    mode: HTML
+    cache: false
 
 #Google login;
   security:
