@@ -1,376 +1,473 @@
 <!DOCTYPE html>
 <html
         xmlns:th="https://www.thymeleaf.org"
-        lang="en"
-        class="light-style customizer-hide"
-        dir="ltr"
-        data-theme="theme-default"
-        data-assets-path="assets/"
-        data-template="vertical-menu-template-free"
->
+        lang="en">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
-    />
+    <meta charset="utf-8">
+    <title>Get A Hold Of Your Money</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
 
-    <title>Spending List</title>
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
 
-    <meta name="description" content=""/>
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" th:href="@{/static/img/favicon/favicon.ico}"/>
+    <!-- Libraries Stylesheet -->
+    <link th:href="@{lib/owlcarousel/assets/owl.carousel.min.css}" rel="stylesheet" type="text/css">
+    <link th:href="@{lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css}" rel="stylesheet" type="text/css">
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
-            rel="stylesheet"
-    />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mukta:300,400,700">
-    <!-- Icons. Uncomment required icon fonts -->
-    <link rel="stylesheet" th:href="@{/static/vendor/fonts/boxicons.css}"/>
+    <!-- Customized Bootstrap Stylesheet -->
+    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet" type="text/css">
 
-    <!-- Core CSS -->
-    <link rel="stylesheet" th:href="@{/static/vendor/css/core.css}" class="template-customizer-core-css"/>
-    <link rel="stylesheet" th:href="@{/static/vendor/css/theme-default.css}" class="template-customizer-theme-css"/>
-    <link rel="stylesheet" th:href="@{/static/css/demo.css}"/>
+    <!-- Template Stylesheet -->
+    <link th:href="@{css/style.css}" rel="stylesheet" type="text/css">
 
-    <!-- Vendors CSS -->
-    <link rel="stylesheet" th:href="@{/static/vendor/libs/perfect-scrollbar/perfect-scrollbar.css}"/>
+    <script>
+        function redirectOnChange() {
+            var selectElement = document.getElementById("filter");
+            var selectedOption = selectElement.options[selectElement.selectedIndex].value;
 
-    <!-- Page CSS -->
-    <!-- Page -->
-    <link rel="stylesheet" th:href="@{/static/vendor/css/pages/page-auth.css}"/>
-    <link rel="stylesheet" th:href="@{/static/vendor/css/pages/page-auth.css}"/>
-    <!-- Helpers -->
-    <script type="text/javascript" th:src="@{/static/vendor/js/helpers.js}"></script>
+            // Redirect to the controller with the selected option as a query parameter
+            window.location.href = "/spending/filter/" + encodeURIComponent(selectedOption);
+        }
 
-    <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-    <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
-    <script type="text/javascript" th:src="@{/static/js/config.js}"></script>
+        function deleteButton() {
+            var selectElement = document.getElementById("filter");
+            var selectedOption = selectElement.options[selectElement.selectedIndex].value;
+
+            // Redirect to the controller with the selected option as a query parameter
+            window.location.href = "/spending/filter/" + encodeURIComponent(selectedOption);
+        }
+
+        function validateForm() {
+            var a = document.forms["addForm"].name.value;
+            var b = document.forms["addForm"].amount.value;
+            var c = document.forms["addForm"].date.value;
+            var d = document.forms["addForm"].detail.value;
+            if ((a == null || a == "") || (b == null || b == "") || (c == null || c == "") || (d == null || d == "")) {
+                alert("Please Fill In All Required Fields");
+                return false;
+            }
+        }
+
+        function validateForm2(){
+            var a = document.forms["updateForm"].name.value;
+            var b = document.forms["updateForm"].amount.value;
+            var c = document.forms["updateForm"].date.value;
+            var d = document.forms["updateForm"].detail.value;
+            if ((a == null || a == "") || (b == null || b == "") || (c == null || c == "") || (d == null || d == "")) {
+                alert("Please Fill In All Required Fields");
+                return false;
+            }
+        }
+
+        function validateForm3(){
+            var a = document.forms["budgetForm"].budget.value;
+            if (a == null || a == "") {
+                alert("Please Enter The Budget");
+                return false;
+            }
+        }
+    </script>
+
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pagination a {
+            padding: 0 5px;
+        }
+    </style>
 </head>
+
 <body>
-<div class="layout-wrapper layout-content-navbar">
-    <div class="layout-container">
-        <!-- Menu -->
-        <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-            <div class="app-brand demo">
-                <a th:href="@{/saving}" class="app-brand-link">
-                            <span class="app-brand-logo demo">
-                                <svg
-                                        width="25"
-                                        viewBox="0 0 25 42"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        xmlns:xlink="http://www.w3.org/1999/xlink"
-                                >
-                                <g id="g-app-brand" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                <g id="Brand-Logo" transform="translate(-27.000000, -15.000000)">
-                                <g id="Icon" transform="translate(27.000000, 15.000000)">
-                                <g id="Mask" transform="translate(0.000000, 8.000000)">
-                                <mask id="mask-2" fill="white">
-                                    <use xlink:href="#path-1"></use>
-                                </mask>
-                                <use fill="#696cff" xlink:href="#path-1"></use>
-                                <g id="Path-3" mask="url(#mask-2)">
-                                <use fill="#696cff" xlink:href="#path-3"></use>
-                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-3"></use>
-                                </g>
-                                <g id="Path-4" mask="url(#mask-2)">
-                                <use fill="#696cff" xlink:href="#path-4"></use>
-                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-4"></use>
-                                </g>
-                                </g>
-                                <g
-                                        id="Triangle"
-                                        transform="translate(19.000000, 11.000000) rotate(-300.000000) translate(-19.000000, -11.000000) "
-                                >
-                                <use fill="#696cff" xlink:href="#path-5"></use>
-                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-5"></use>
-                                </g>
-                                </g>
-                                </g>
-                                </g>
-                                </svg>
-                            </span>
-                    <span class="app-brand-text menu-text fw-bolder"
-                          style="border-width:1px; border-style:solid; border-color:#696cff; padding: 5px; font-family: 'Mukta';color: #696cff; font-weight: 50; font-size: 25px"> PERSONAL FINANCE </span>
-                </a>
-
-                <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
-                    <i class="bx bx-chevron-left bx-sm align-middle"></i>
-                </a>
-            </div>
-
-            <div class="menu-inner-shadow"></div>
-
-            <ul class="menu-inner py-1">
-                <!-- Spending -->
-                <li class="menu-item active">
-                    <a th:href="@{/spending}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                        <div data-i18n="Analytics">Spending</div>
-                    </a>
-                </li>
-
-
-                <!-- Loan -->
-                <li class="menu-header small text-uppercase"><span class="menu-header-text">Management</span></li>
-                <!-- Loan -->
-                <li class="menu-item">
-                    <a th:href="@{/loan}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-collection"></i>
-                        <div data-i18n="Basic">Loan</div>
-                    </a>
-                </li>
-                <!-- Wishlist -->
-                <li class="menu-item">
-                    <a th:href="@{/wishlist}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-group"></i>
-                        <div data-i18n="Basic">Wishlist</div>
-                    </a>
-                </li>
-                <!-- Saving -->
-                <li class="menu-item">
-                    <a th:href="@{/saving}" class="menu-link active">
-                        <i class="menu-icon tf-icons bx bxs-discount"></i>
-                        <div data-i18n="Basic">Saving</div>
-                    </a>
-                </li>
-                <!-- Budget -->
-                <li class="menu-item">
-                    <a th:href="@{/budget}" class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-news"></i>
-                        <div data-i18n="Basic">Budget</div>
-                    </a>
-                </li>
-            </ul>
-        </aside>
-        <!-- Menu -->
-        <!-- Layout container -->
-        <div class="layout-page">
-            <!-- Navbar -->
-
-            <nav
-                    class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
-                    id="layout-navbar"
-            >
-                <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-                    <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
-                        <i class="bx bx-menu bx-sm"></i>
-                    </a>
-                </div>
-
-                <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-                    <!-- Search -->
-                    <div class="navbar-nav align-items-center">
-                        <div class="nav-item d-flex align-items-center">
-                            <label>
-                                <input type="text" class="form-control border-0 shadow-none"/>
-                            </label>
-                        </div>
-                    </div>
-                    <!-- /Search -->
-
-                    <ul class="navbar-nav flex-row align-items-center ms-auto">
-                        <!-- User -->
-                        <li class="nav-item navbar-dropdown dropdown-user dropdown">
-                            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
-                               data-bs-toggle="dropdown">
-                                <div class="avatar avatar-online">
-                                    <img src="../static/img/avatars/1.png" alt class="w-px-40 h-px-40 rounded-circle"/>
-                                </div>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" th:href="@{/saving}">
-                                        <div class="d-flex">
-                                            <div class="flex-shrink-0 me-3">
-                                                <div class="avatar avatar-online">
-                                                    <img src="../static/img/avatars/1.png" alt
-                                                         class="w-px-40 h-px-40 rounded-circle"/>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <span class="fw-semibold d-block">Name</span>
-                                                <small class="text-muted">Admin</small>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <div class="dropdown-divider"></div>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" th:href="@{/saving}">
-                                        <i class="bx bx-user me-2"></i>
-                                        <span class="align-middle">My Profile</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bx bx-cog me-2"></i>
-                                        <span class="align-middle">Settings</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <div class="dropdown-divider"></div>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" th:href="@{/saving}">
-                                        <i class="bx bx-power-off me-2"></i>
-                                        <span class="align-middle">Log Out</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <!--/ User -->
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- / Navbar -->
-
-            <!-- Content wrapper -->
-            <div class="container-fluid pt-4 px-4">
-                <div class="row g-4">
-                    <div class="col-sm-6 col-xl-3">
-                        <a th:href="@{/spending}">
-                            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                                <i class='bx bxs-bar-chart-square bx-flip-horizontal bx-lg'></i>
-                                <div class="ms-3">
-                                    <p class="mb-2">This Month Budget</p>
-                                    <h6 class="mb-0" th:text="${m_budget}"></h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-xl-3">
-                        <a th:href="@{/spending}">
-                            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                                <i class='bx bx-line-chart bx-lg'></i>
-                                <div class="ms-3">
-                                    <p class="mb-2">This month Spending</p>
-                                    <h6 class="mb-0" th:text="${m_spending}"></h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-xl-3">
-                        <a th:href="@{/spending}">
-                            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                                <i class='bx bxs-chart bx-lg'></i>
-                                <div class="ms-3">
-                                    <p class="mb-2">This Month Saving</p>
-                                    <h6 class="mb-0" th:text="${m_saving}"></h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="col-sm-6 col-xl-3">
-                        <a th:href="@{/spending}">
-                            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                                <i class='bx bxs-pie-chart-alt-2 bx-lg'></i>
-                                <div class="ms-3">
-                                    <p class="mb-2">Total Saving</p>
-                                    <h6 class="mb-0" th:text="${totalSaving}"></h6>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <!-- Sale & Revenue End -->
-
-            <!-- Recent Sales Start -->
-            <!--Truy van top 5 cac thong tin lien quan den Order -->
-
-            <div class="container-fluid pt-4 px-4">
-                <div class="bg-light text-center rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">Recent Sales</h6>
-                    </div>
-                    <!--Search-->
-                    <!--Search-->
-                    <div id="tableContent">
-                        <div class="table-responsive">
-                            <table class="table text-start align-middle table-bordered table-hover mb-0">
-                                <thead>
-                                <tr class="text-dark">
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Detail</th>
-                                    <th scope="col">Date Of Spending</th>
-                                    <th scope="col">Price</th>
-                                    <th scope="col">Note</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr th:each="spending: ${spendingList}">
-                                    <td th:text="${spending.name}"/>
-                                    <td th:text="${spending.detail}"/>
-                                    <td th:text="${spending.dateOfSpending}"/>
-                                    <td th:text="${spending.amount}"/>
-                                    <td th:text="${spending.note}"/>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Recent Sales End -->
-
-
-            <!-- Footer Start -->
-            <div class="container-fluid pt-4 px-4">
-                <div class="bg-light rounded-top p-4">
-                    <div class="row">
-                        <div class="col-12 col-sm-6 text-center text-sm-start">
-                            Address: #Insert Address <br>
-                            &copy; <a href="#">Your Site Name</a>, All Right Reserved.
-                        </div>
-                        <div class="col-12 col-sm-6 text-center text-sm-end">
-                            <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
-                            Contact Info: #Insert phone number
-                            <br>
-                            Email: electro@gmail.com
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Footer End -->
+<div class="container-fluid position-relative d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
         </div>
-        <!-- Content End -->
-
-
-        <!-- Back to Top -->
     </div>
+    <!-- Spinner End -->
+
+
+    <!-- Sidebar Start -->
+    <div class="sidebar pe-4 pb-3">
+        <nav class="navbar bg-secondary navbar-dark">
+            <a th:href="@{/spending}" class="navbar-brand mx-4 mb-3">
+                <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>DarkPan</h3>
+            </a>
+            <div class="d-flex align-items-center ms-4 mb-4">
+                <div class="position-relative">
+                    <img class="rounded-circle" th:src="@{img/user.jpg}" alt="" style="width: 40px; height: 40px;">
+                    <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                </div>
+                <div class="ms-3">
+                    <h6 class="mb-0" th:text="${uname}"></h6>
+                    <span>Admin</span>
+                </div>
+            </div>
+            <div class="navbar-nav w-100">
+                <div class="nav-item dropdown">
+                    <a th:href="@{/spending}" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown"><i class="fa fa-wallet me-2"></i>Expense</a>
+                    <div class="dropdown-menu bg-transparent border-0">
+                        <a th:href="@{/spending}" class="dropdown-item">This Month</a>
+                        <a th:href="@{/spending}" class="dropdown-item">This Year</a>
+                        <a th:href="@{/spending}" class="dropdown-item">All Time</a>
+                    </div>
+                </div>
+                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-gift me-2"></i>Wishlist</a>
+                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-shield-alt me-2"></i>Loan</a>
+                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-money-bill me-2"></i>Saving</a>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
+                    <div class="dropdown-menu bg-transparent border-0">
+                        <a th:href="@{/spending}" class="dropdown-item">Sign In</a>
+                        <a th:href="@{/spending}" class="dropdown-item">Sign Up</a>
+                        <a th:href="@{/spending}" class="dropdown-item">404 Error</a>
+                        <a th:href="@{/spending}" class="dropdown-item">Blank Page</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <nav class="navbar navbar-expand bg-secondary navbar-dark sticky-top px-4 py-0">
+            <a th:href="@{/spending}" class="navbar-brand d-flex d-lg-none me-4">
+                <h2 class="text-primary mb-0"><i class="fa fa-user-edit"></i></h2>
+            </a>
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+            <form class="d-none d-md-flex ms-4">
+                <input class="form-control bg-dark border-0" type="search" placeholder="Search">
+                <button type="button" class="btn btn-primary ms-2">Search</button>
+            </form>
+            <div class="navbar-nav align-items-center ms-auto">
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-envelope me-lg-2"></i>
+                        <span class="d-none d-lg-inline-flex">Message</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                        <a href="#" class="dropdown-item">
+                            <div class="d-flex align-items-center">
+                                <img class="rounded-circle" th:src="@{img/user.jpg}" alt="" style="width: 40px; height: 40px;">
+                                <div class="ms-2">
+                                    <h6 class="fw-normal mb-0">John send you a message</h6>
+                                    <small>15 minutes ago</small>
+                                </div>
+                            </div>
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item">
+                            <div class="d-flex align-items-center">
+                                <img class="rounded-circle" th:src="@{img/user.jpg}" alt="" style="width: 40px; height: 40px;">
+                                <div class="ms-2">
+                                    <h6 class="fw-normal mb-0">John send you a message</h6>
+                                    <small>15 minutes ago</small>
+                                </div>
+                            </div>
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item">
+                            <div class="d-flex align-items-center">
+                                <img class="rounded-circle" th:src="@{img/user.jpg}" alt="" style="width: 40px; height: 40px;">
+                                <div class="ms-2">
+                                    <h6 class="fw-normal mb-0">John send you a message</h6>
+                                    <small>15 minutes ago</small>
+                                </div>
+                            </div>
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item text-center">See all message</a>
+                    </div>
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fa fa-bell me-lg-2"></i>
+                        <span class="d-none d-lg-inline-flex">Notification</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                        <a href="#" class="dropdown-item">
+                            <h6 class="fw-normal mb-0">Profile updated</h6>
+                            <small>15 minutes ago</small>
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item">
+                            <h6 class="fw-normal mb-0">New user added</h6>
+                            <small>15 minutes ago</small>
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item">
+                            <h6 class="fw-normal mb-0">Password changed</h6>
+                            <small>15 minutes ago</small>
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="#" class="dropdown-item text-center">See all notifications</a>
+                    </div>
+                </div>
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <img class="rounded-circle me-lg-2" th:src="@{img/user.jpg}" alt="" style="width: 40px; height: 40px;">
+                        <span class="d-none d-lg-inline-flex" th:text="${uname}"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-secondary border-0 rounded-0 rounded-bottom m-0">
+                        <a href="#" class="dropdown-item">My Profile</a>
+                        <a href="#" class="dropdown-item">Settings</a>
+                        <a th:href="@{/logout}" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar End -->
+
+
+        <!-- Sale & Revenue Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                        <i class="fa fa-chart-line fa-3x text-primary"></i>
+                        <div class="ms-3">
+                            <p class="mb-2">This Month Budget</p>
+                            <h6 class="mb-0" th:text="${m_budget}"></h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                        <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                        <div class="ms-3">
+                            <p class="mb-2">Spent This Month</p>
+                            <h6 class="mb-0" th:text="${m_spending}"></h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                        <i class="fa fa-chart-area fa-3x text-primary"></i>
+                        <div class="ms-3">
+                            <p class="mb-2">Saved This Month</p>
+                            <h6 class="mb-0" th:text="${m_saving}"></h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
+                        <i class="fa fa-chart-pie fa-3x text-primary"></i>
+                        <div class="ms-3">
+                            <p class="mb-2">Total Saving</p>
+                            <h6 class="mb-0" th:text="${totalSaving}"></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Sale & Revenue End -->
+
+        <!-- Recent Sales Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-secondary text-center rounded p-4">
+                <form th:action="@{/spending/add}" th:object="${spending}" method="post">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">Your Recent Expense</h6>
+                        <!--<label for="filter">Sort by Time:</label>
+                        <select name="filter" id="filter" th:onchange="redirectOnChange()">
+                            <option value="0">Date Desc</option>
+                            <option value="1">Date Asc</option>
+                        </select>
+                        -->
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table text-start align-middle table-bordered table-hover mb-0">
+                            <thead>
+                            <tr class="text-dark" style="background-color: #EE1616FF;">
+                                <th scope="col" style="color: white; text-align: center">Name</th>
+                                <th scope="col" style="color: white; text-align: center">Detail</th>
+                                <th scope="col" style="color: white; text-align: center">Date Of Spending</th>
+                                <th scope="col" style="color: white; text-align: center">Price</th>
+                                <th scope="col" style="color: white; text-align: center">Note</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="spending: ${spendingList}" style="align-content: center">
+                                <td style="text-align: center" th:text="${spending.name}"/>
+                                <td style="text-align: center" th:text="${spending.detail}"/>
+                                <td style="text-align: center" th:text="${spending.dateOfSpending}"/>
+                                <td style="text-align: center" th:text="${spending.amountConfig}"/>
+                                <td style="text-align: center" th:text="${spending.note}"/>
+                                <td style="text-align: center"><a th:href="@{/spending/delete/{spendingId}(spendingId=${spending.id})}" class="btn btn-sm btn-primary" href="" onclick="return confirm('Are you sure you want to delete this item?');"><i class="fa fa-times"></i></a></td>
+                                <td style="text-align: center"><a th:href="@{/spending/update/{spendingId}(spendingId=${spending.id})}" class="btn btn-sm btn-primary" href="">Update</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <br>
+                    <!--Pagination Start-->
+                    <div th:if="${spendingList.totalPages > 0}" class="pagination">
+                        <span th:each="pageNumber : ${pageNumbers}">
+                            <a th:href="@{/spending(size=${spendingList.size}, page=${pageNumber})}"
+                               th:text="${pageNumber}"
+                               th:class="${pageNumber == spendingList.number + 1} ? 'active'"></a>
+                        </span>
+                    </div>
+                    <!--Pagination End-->
+                </form>
+            </div>
+        </div>
+        <!-- Recent Sales End -->
+
+        <!-- Widgets Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="row g-4">
+                <div class="col-sm-12 col-md-6 col-xl-4">
+                    <div class="h-100 bg-secondary rounded p-4">
+                        <form th:action="@{/spending/budget}" th:object="${spending}" method="post" name="budgetForm" id="budgetForm" onsubmit="return validateForm3()">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="mb-0">Budget Setting</h6>
+                                <a href="">Show All</a>
+                            </div>
+                            <div class="d-flex align-items-center border-bottom py-3">
+                                <div class="w-100 ms-3">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-0">Let's set the budget for this month</h6>
+                                    </div>
+                                    <span>Bee wise with you money</span>
+                                </div>
+                            </div>
+                            <div class="d-flex mb-4">
+                                <input class="form-control bg-dark border-0" type="number" placeholder="Enter the budget" name="budget" min="0"/>
+                                <input type="submit" class="btn btn-primary ms-2" value="Add"/>
+                            </div>
+                        </form>
+                        <br>
+                        <div class="bg-secondary rounded p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="mb-0">Calendar</h6>
+                            </div>
+                            <div id="calender"></div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-xl-4">
+                    <div class="h-100 bg-secondary rounded p-4">
+                        <form th:action="@{/spending/update}" th:object="${spending}" method="post" name="updateForm" id="updateForm" onsubmit="return validateForm2()">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0">Expense Info Update</h6>
+                            </div>
+                            <div class="d-flex align-items-center border-bottom py-3">
+                                <div class="w-100 ms-3">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-0">Would you like to make some changes?</h6>
+                                    </div>
+                                    <span>There's an eraser at the back of a pencil for a reason</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column mb-2">
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Purpose" name="name"  th:value="${spendingInfo?.name}"><br>
+
+                                <input class="form-control bg-dark border-0" type="number" placeholder="Enter the Amount" min="0" name="amount" th:value="${spendingInfo?.amount}"><br>
+
+                                <input class="form-control bg-dark border-0" type="date" placeholder="Enter the Date" name="date" th:value="${spendingInfo?.dateOfSpending}"><br>
+
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Description" name="detail" th:value="${spendingInfo?.detail}"><br>
+
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Note" name="note" th:value="${spendingInfo?.note}"><br>
+
+                                <input type="submit" class="btn btn-primary ms-2" value="Update" >
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-6 col-xl-4">
+                    <div class="h-100 bg-secondary rounded p-4">
+                        <form th:action="@{/spending/add}" th:object="${spending}" method="post" name="addForm" id="addForm" onsubmit="return validateForm()">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0">Expense Setting</h6>
+                            </div>
+                            <div class="d-flex align-items-center border-bottom py-3">
+                                <div class="w-100 ms-3">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-0">Would you like to add any expense</h6>
+                                    </div>
+                                    <span>Remember! Money don't grow on tree</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column mb-2">
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Purpose (*)" name="name"><br>
+
+                                <input class="form-control bg-dark border-0" type="number" placeholder="Enter the Amount (*)" min="0" name="amount"><br>
+
+                                <input class="form-control bg-dark border-0" type="date" placeholder="Enter the Date (*)" name="date"><br>
+
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Description (*)" name="detail"><br>
+
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Note" name="note"><br>
+
+                                <input type="submit" class="btn btn-primary ms-2" value="Add" >
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Widgets End -->
+
+        <!-- Footer Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-secondary rounded-top p-4">
+                <div class="row">
+                    <div class="col-12 col-sm-6 text-center text-sm-start">
+                        &copy; <a href="#">Personal Finance Management App</a>, All Right Reserved.
+                    </div>
+                    <div class="col-12 col-sm-6 text-center text-sm-end">
+                        <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                        Version 2.1
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer End -->
+    </div>
+    <!-- Content End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 </div>
 
-<!-- Core JS -->
-<!-- build:js assets/vendor/js/core.js -->
-<script th:src="@{/static/vendor/libs/jquery/jquery.js}"></script>
-<script th:src="@{/static/vendor/libs/popper/popper.js}"></script>
-<script th:src="@{/static/vendor/js/bootstrap.js}"></script>
-<script th:src="@{/static/vendor/libs/perfect-scrollbar/perfect-scrollbar.js}"></script>
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{lib/chart/chart.min.js}"></script>
+<script th:src="@{lib/easing/easing.min.js}"></script>
+<script th:src="@{lib/waypoints/waypoints.min.js}"></script>
+<script th:src="@{lib/owlcarousel/owl.carousel.min.js}"></script>
+<script th:src="@{lib/tempusdominus/js/moment.min.js}"></script>
+<script th:src="@{lib/tempusdominus/js/moment-timezone.min.js}"></script>
+<script th:src="@{lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js}"></script>
 
-<script th:src="@{/static/vendor/js/menu.js}"></script>
-<!-- endbuild -->
-
-<!-- Vendors JS -->
-
-<!-- Main JS -->
-<script th:src="@{/static/js/main.js}"></script>
-
-<!-- Page JS -->
-
-<!-- Place this tag in your head or just before your close body tag. -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
 <!-- Template Javascript -->
-<script type="text/javascript" th:src="@{/static/js/main.js}"></script>
-
+<script th:src="@{js/main.js}"></script>
 </body>
 
 </html>

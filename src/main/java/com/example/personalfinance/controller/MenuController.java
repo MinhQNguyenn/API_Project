@@ -25,10 +25,10 @@ import java.util.stream.IntStream;
 
 @Controller
 public class MenuController {
-    private SpendingService spendingService = new SpendingService();
-    private SpendingImpl spendingDao = new SpendingImpl();
-    private BudgetImpl budgetDao = new BudgetImpl();
-    private SavingImpl savingDao = new SavingImpl();
+    private final SpendingService spendingService = new SpendingService();
+    private final SpendingImpl spendingDao = new SpendingImpl();
+    private final BudgetImpl budgetDao = new BudgetImpl();
+    private final SavingImpl savingDao = new SavingImpl();
     private LocalDate localDate = LocalDate.now();
     private int m_budget = 0, m_spending= 0, saving= 0;
 
@@ -40,18 +40,22 @@ public class MenuController {
     public String spending(Model model,
                            @RequestParam("page") Optional<Integer> page,
                            @RequestParam("size") Optional<Integer> size,
-                           @SessionAttribute("uid") int uid){
+                           @SessionAttribute("uid") Integer uid,
+                           @SessionAttribute("uname") String uname){
         //Assume automatically if the current page and its size is not specified
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(5);
 
+        //Redirect if haven't logged in properly yet
+        if(uid==null) return "loginPage";
+
         //Getting the content for the expense list of the user
-        Page<Spending> spendingList = spendingService.findPaginated(PageRequest.of(currentPage - 1, pageSize), 1, localDate.getMonthValue(), localDate.getYear());
+        Page<Spending> spendingList = spendingService.findPaginated(PageRequest.of(currentPage - 1, pageSize), uid, localDate.getMonthValue(), localDate.getYear());
 
         //Getting the content for the 4 charts
-        m_budget = budgetDao.getMonthBudget(1, localDate.getMonthValue(), localDate.getYear());
-        m_spending = spendingDao.getMonthSpending(1, localDate.getMonthValue(), localDate.getYear());
-        saving = savingDao.getTotalSaving(1);
+        m_budget = budgetDao.getMonthBudget(uid, localDate.getMonthValue(), localDate.getYear());
+        m_spending = spendingDao.getMonthSpending(uid, localDate.getMonthValue(), localDate.getYear());
+        saving = savingDao.getTotalSaving(uid);
 
         //Configure the contents to send to the view page
         model.addAttribute("m_budget", moneyconfig(m_budget));
@@ -59,10 +63,11 @@ public class MenuController {
         model.addAttribute("m_saving", moneyconfig(m_budget-m_spending));
         model.addAttribute("totalSaving", moneyconfig(saving));
         model.addAttribute("spendingList",spendingList);
+        model.addAttribute("uname", uname);
 
         //If the user want to update
         if(isUpdate){
-            Spending spending = spendingDao.getSpendingInfo(updateId, 1);
+            Spending spending = spendingDao.getSpendingInfo(updateId, uid);
             model.addAttribute("spendingInfo", spending);
             isUpdate=false;
         }
@@ -82,7 +87,8 @@ public class MenuController {
                                  @RequestParam("detail") String detail,
                                  @RequestParam("amount") String amount,
                                  @RequestParam("date") String date,
-                                 @RequestParam("note") String note){
+                                 @RequestParam("note") String note,
+                                 @SessionAttribute("uid") int uid){
         //Check whether the note is empty and assign value to it if it's
         if(note.isEmpty()) note ="";
 
@@ -98,21 +104,22 @@ public class MenuController {
                                  @RequestParam("detail") String detail,
                                  @RequestParam("amount") String amount,
                                  @RequestParam("date") String date,
-                                 @RequestParam("note") String note){
+                                 @RequestParam("note") String note,
+                                 @SessionAttribute("uid") int uid){
         //Check whether the note is empty and assign value to it if it's
         if(note.isEmpty()) note ="";
         int price = Integer.parseInt(amount);
         Date dateOfSpending = dateStringConvertor(date);
 
         //Check if there's any change in the data
-        Spending spending = spendingDao.getSpendingInfo(updateId, 1);
+        Spending spending = spendingDao.getSpendingInfo(updateId, uid);
         Spending temp = new Spending(updateId, price, name, dateOfSpending, detail, 1, note);
         if(!temp.equals(spending)){
             //Delete the expense from the database
-            spendingDao.realDelete(1, updateId);
+            spendingDao.realDelete(uid, updateId);
 
             //Add a new expense with the value given as before
-            spendingDao.addSpending(price, dateOfSpending, detail, name, note, 1);
+            spendingDao.addSpending(price, dateOfSpending, detail, name, note, uid);
         }else System.out.println("No change made!!!!!!!!!");
         return "redirect:/spending";
     }
@@ -126,9 +133,10 @@ public class MenuController {
         return "redirect:/spending";
     }
 
-    @GetMapping("/spending/budget")
-    public String setBudget(@RequestParam("budget") String budget){
-        budgetDao.setBudget(1, localDate.getMonthValue(), localDate.getYear(), Integer.parseInt(budget));
+    @PostMapping("/spending/budget")
+    public String setBudget(@RequestParam("budget") String budget,
+                            @SessionAttribute("uid") int uid){
+        budgetDao.setBudget(uid, localDate.getMonthValue(), localDate.getYear(), Integer.parseInt(budget));
         return "redirect:/spending";
     }
 
@@ -174,9 +182,10 @@ public class MenuController {
 //    }
 
     @GetMapping("/spending/delete/{id}")
-    public String deleteSpending(@PathVariable String id){
+    public String deleteSpending(@PathVariable String id,
+                                 @SessionAttribute("uid") int uid){
         int temp = Integer.parseInt(id);
-        spendingDao.deleteSpending(1, temp);
+        spendingDao.deleteSpending(uid, temp);
         return "redirect:/spending";
     }
 

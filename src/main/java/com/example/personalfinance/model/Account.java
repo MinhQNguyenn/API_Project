@@ -35,5 +35,9 @@ public class Account {
     public Account() {
     }
 
+    public Account(int id, String name){
+        this.id= (long) id;
+        this.name=name;
+    }
 }
 

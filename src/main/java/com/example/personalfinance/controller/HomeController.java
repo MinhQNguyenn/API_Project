@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller
 public class HomeController {
 
-    @GetMapping ("/login")
-    public String home(){
-        return "redirect:/login";
-    }
+//    @GetMapping ("/login")
+//    public String home(){
+//        return "redirect:/login";
+//    }
 //
 //    @GetMapping("/secured")
 //    public String secured(){
