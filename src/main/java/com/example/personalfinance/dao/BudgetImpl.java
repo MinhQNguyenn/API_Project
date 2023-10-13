@@ -4,7 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.*;
 
-public class BudgetDaoImpl implements BudgetDao{
+public class BudgetImpl implements BudgetDao {
     JdbcTemplate jdbcTemplate = new JdbcTemplate();
     private final String url = "jdbc:postgresql://localhost:5432/PersonalFinance";
     private final String user = "sa";
@@ -29,6 +29,22 @@ public class BudgetDaoImpl implements BudgetDao{
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }return budget;
+    }
+
+    @Override
+    public void setBudget(int userId, int month, int year, int amount) {
+        String sql = "SELECT FROM setBudget(?, ?, ?, ?)";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, month);
+            pstmt.setInt(3, year);
+            pstmt.setInt(4, amount);
+            pstmt.execute();
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private Connection connect() throws SQLException{

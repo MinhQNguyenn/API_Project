@@ -81,4 +81,15 @@ public class Spending {
         }
         return a.toString();
     }
+
+    public boolean equals(Spending s) {
+        boolean check = true;
+        if(!this.note.isEmpty() && !s.note.isEmpty() && this.note.compareTo(s.note) == 0) check=false;
+        if(this.amount == s.amount) check=false;
+        if(!(this.dateOfSpending == null) && !(s.dateOfSpending == null) && this.dateOfSpending.compareTo(s.dateOfSpending)==0) check=false;
+        if(!this.name.isEmpty() && !s.name.isEmpty() && this.name.compareTo(s.name)==0) check =false;
+        if(!this.detail.isEmpty() && !s.detail.isEmpty() && this.detail.compareTo(s.detail)==0) check=false;
+        return check;
+    }
 }
+

@@ -28,6 +28,66 @@
 
     <!-- Template Stylesheet -->
     <link th:href="@{css/style.css}" rel="stylesheet" type="text/css">
+
+    <script>
+        function redirectOnChange() {
+            var selectElement = document.getElementById("filter");
+            var selectedOption = selectElement.options[selectElement.selectedIndex].value;
+
+            // Redirect to the controller with the selected option as a query parameter
+            window.location.href = "/spending/filter/" + encodeURIComponent(selectedOption);
+        }
+
+        function deleteButton() {
+            var selectElement = document.getElementById("filter");
+            var selectedOption = selectElement.options[selectElement.selectedIndex].value;
+
+            // Redirect to the controller with the selected option as a query parameter
+            window.location.href = "/spending/filter/" + encodeURIComponent(selectedOption);
+        }
+
+        function validateForm() {
+            var a = document.forms["addForm"].name.value;
+            var b = document.forms["addForm"].amount.value;
+            var c = document.forms["addForm"].date.value;
+            var d = document.forms["addForm"].detail.value;
+            if ((a == null || a == "") || (b == null || b == "") || (c == null || c == "") || (d == null || d == "")) {
+                alert("Please Fill In All Required Fields");
+                return false;
+            }
+        }
+
+        function validateForm2(){
+            var a = document.forms["updateForm"].name.value;
+            var b = document.forms["updateForm"].amount.value;
+            var c = document.forms["updateForm"].date.value;
+            var d = document.forms["updateForm"].detail.value;
+            if ((a == null || a == "") || (b == null || b == "") || (c == null || c == "") || (d == null || d == "")) {
+                alert("Please Fill In All Required Fields");
+                return false;
+            }
+        }
+
+        function validateForm3(){
+            var a = document.forms["budgetForm"].budget.value;
+            if (a == null || a == "") {
+                alert("Please Enter The Budget");
+                return false;
+            }
+        }
+    </script>
+
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .pagination a {
+            padding: 0 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -59,17 +119,16 @@
             </div>
             <div class="navbar-nav w-100">
                 <div class="nav-item dropdown">
-                    <a th:href="@{/spending}" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown"><i class="fa fa-wallet me-2"></i>Spending</a>
+                    <a th:href="@{/spending}" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown"><i class="fa fa-wallet me-2"></i>Expense</a>
                     <div class="dropdown-menu bg-transparent border-0">
                         <a th:href="@{/spending}" class="dropdown-item">This Month</a>
                         <a th:href="@{/spending}" class="dropdown-item">This Year</a>
                         <a th:href="@{/spending}" class="dropdown-item">All Time</a>
                     </div>
                 </div>
-                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Widgets</a>
-                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Forms</a>
-                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Tables</a>
-                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
+                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-gift me-2"></i>Wishlist</a>
+                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-shield-alt me-2"></i>Loan</a>
+                <a th:href="@{/spending}" class="nav-item nav-link"><i class="fa fa-money-bill me-2"></i>Saving</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="far fa-file-alt me-2"></i>Pages</a>
                     <div class="dropdown-menu bg-transparent border-0">
@@ -97,6 +156,7 @@
             </a>
             <form class="d-none d-md-flex ms-4">
                 <input class="form-control bg-dark border-0" type="search" placeholder="Search">
+                <button type="button" class="btn btn-primary ms-2">Search</button>
             </form>
             <div class="navbar-nav align-items-center ms-auto">
                 <div class="nav-item dropdown">
@@ -224,34 +284,53 @@
         <!-- Recent Sales Start -->
         <div class="container-fluid pt-4 px-4">
             <div class="bg-secondary text-center rounded p-4">
+                <form th:action="@{/spending/add}" th:object="${spending}" method="post">
                 <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h6 class="mb-0">Your Recent Spending</h6>
-                    <a href="">Filter here</a>
+                    <h6 class="mb-0">Your Recent Expense</h6>
+                    <!--<label for="filter">Sort by Time:</label>
+                    <select name="filter" id="filter" th:onchange="redirectOnChange()">
+                        <option value="0">Date Desc</option>
+                        <option value="1">Date Asc</option>
+                    </select>
+                    -->
                 </div>
                 <div class="table-responsive">
                     <table class="table text-start align-middle table-bordered table-hover mb-0">
                         <thead>
                         <tr class="text-dark" style="background-color: #EE1616FF;">
-                            <th scope="col" style="color: white;">Name</th>
-                            <th scope="col" style="color: white;">Detail</th>
-                            <th scope="col" style="color: white;">Date Of Spending</th>
-                            <th scope="col" style="color: white;">Price</th>
-                            <th scope="col" style="color: white;">Note</th>
+                            <th scope="col" style="color: white; text-align: center">Name</th>
+                            <th scope="col" style="color: white; text-align: center">Detail</th>
+                            <th scope="col" style="color: white; text-align: center">Date Of Spending</th>
+                            <th scope="col" style="color: white; text-align: center">Price</th>
+                            <th scope="col" style="color: white; text-align: center">Note</th>
+                            <th></th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="spending: ${spendingList}">
-                            <td th:text="${spending.name}"/>
-                            <td th:text="${spending.detail}"/>
-                            <td th:text="${spending.dateOfSpending}"/>
-                            <td th:text="${spending.amountConfig}"/>
-                            <td th:text="${spending.note}"/>
-                            <td><a class="btn btn-sm btn-primary" href="">Detail</a></td>
+                        <tr th:each="spending: ${spendingList}" style="align-content: center">
+                            <td style="text-align: center" th:text="${spending.name}"/>
+                            <td style="text-align: center" th:text="${spending.detail}"/>
+                            <td style="text-align: center" th:text="${spending.dateOfSpending}"/>
+                            <td style="text-align: center" th:text="${spending.amountConfig}"/>
+                            <td style="text-align: center" th:text="${spending.note}"/>
+                            <td style="text-align: center"><a th:href="@{/spending/delete/{spendingId}(spendingId=${spending.id})}" class="btn btn-sm btn-primary" href="" onclick="return confirm('Are you sure you want to delete this item?');"><i class="fa fa-times"></i></a></td>
+                            <td style="text-align: center"><a th:href="@{/spending/update/{spendingId}(spendingId=${spending.id})}" class="btn btn-sm btn-primary" href="">Update</a></td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
+                    <br>
+                    <!--Pagination Start-->
+                    <div th:if="${spendingList.totalPages > 0}" class="pagination">
+                        <span th:each="pageNumber : ${pageNumbers}">
+                            <a th:href="@{/spending(size=${spendingList.size}, page=${pageNumber})}"
+                            th:text="${pageNumber}"
+                            th:class="${pageNumber == spendingList.number + 1} ? 'active'"></a>
+                        </span>
+                    </div>
+                    <!--Pagination End-->
+                </form>
             </div>
         </div>
         <!-- Recent Sales End -->
@@ -261,115 +340,92 @@
             <div class="row g-4">
                 <div class="col-sm-12 col-md-6 col-xl-4">
                     <div class="h-100 bg-secondary rounded p-4">
+                        <form th:action="@{/spending/budget}" th:object="${spending}" method="post" name="budgetForm" id="budgetForm" onsubmit="return validateForm3()">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <h6 class="mb-0">Budget Setting</h6>
                             <a href="">Show All</a>
                         </div>
                         <div class="d-flex align-items-center border-bottom py-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
                             <div class="w-100 ms-3">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-0">Jhon Doe</h6>
-                                    <small>15 minutes ago</small>
+                                    <h6 class="mb-0">Let's set the budget for this month</h6>
                                 </div>
-                                <span>Short message goes here...</span>
+                                <span>Bee wise with you money</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center border-bottom py-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-0">Jhon Doe</h6>
-                                    <small>15 minutes ago</small>
-                                </div>
-                                <span>Short message goes here...</span>
-                            </div>
+                        <div class="d-flex mb-4">
+                            <input class="form-control bg-dark border-0" type="number" placeholder="Enter the budget" name="budget" min="0"/>
+                            <input type="submit" class="btn btn-primary ms-2" value="Add"/>
                         </div>
-                        <div class="d-flex align-items-center border-bottom py-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-0">Jhon Doe</h6>
-                                    <small>15 minutes ago</small>
-                                </div>
-                                <span>Short message goes here...</span>
+                        </form>
+                        <br>
+                        <div class="bg-secondary rounded p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <h6 class="mb-0">Calendar</h6>
                             </div>
+                            <div id="calender"></div>
                         </div>
-                        <div class="d-flex align-items-center pt-3">
-                            <img class="rounded-circle flex-shrink-0" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-0">Jhon Doe</h6>
-                                    <small>15 minutes ago</small>
-                                </div>
-                                <span>Short message goes here...</span>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-6 col-xl-4">
                     <div class="h-100 bg-secondary rounded p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h6 class="mb-0">Calender</h6>
-                        </div>
-                        <div id="calender"></div>
+                        <form th:action="@{/spending/update}" th:object="${spending}" method="post" name="updateForm" id="updateForm" onsubmit="return validateForm2()">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0">Expense Info Update</h6>
+                            </div>
+                            <div class="d-flex align-items-center border-bottom py-3">
+                                <div class="w-100 ms-3">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-0">Would you like to make some changes?</h6>
+                                    </div>
+                                    <span>There's an eraser at the back of a pencil for a reason</span>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column mb-2">
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Purpose" name="name"  th:value="${spendingInfo?.name}"><br>
+
+                                <input class="form-control bg-dark border-0" type="number" placeholder="Enter the Amount" min="0" name="amount" th:value="${spendingInfo?.amount}"><br>
+
+                                <input class="form-control bg-dark border-0" type="date" placeholder="Enter the Date" name="date" th:value="${spendingInfo?.dateOfSpending}"><br>
+
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Description" name="detail" th:value="${spendingInfo?.detail}"><br>
+
+                                <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Note" name="note" th:value="${spendingInfo?.note}"><br>
+
+                                <input type="submit" class="btn btn-primary ms-2" value="Update" >
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-6 col-xl-4">
                     <div class="h-100 bg-secondary rounded p-4">
+                        <form th:action="@{/spending/add}" th:object="${spending}" method="post" name="addForm" id="addForm" onsubmit="return validateForm()">
                         <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h6 class="mb-0">Search</h6>
-                            <a href="">Show All</a>
+                            <h6 class="mb-0">Expense Setting</h6>
                         </div>
-                        <div class="d-flex mb-2">
-                            <input class="form-control bg-dark border-0" type="text" placeholder="Enter task">
-                            <button type="button" class="btn btn-primary ms-2">Add</button>
-                        </div>
-                        <div class="d-flex align-items-center border-bottom py-2">
-                            <input class="form-check-input m-0" type="checkbox">
+                        <div class="d-flex align-items-center border-bottom py-3">
                             <div class="w-100 ms-3">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <span>Short task goes here...</span>
-                                    <button class="btn btn-sm"><i class="fa fa-times"></i></button>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-0">Would you like to add any expense</h6>
                                 </div>
+                                <span>Remember! Money don't grow on tree</span>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center border-bottom py-2">
-                            <input class="form-check-input m-0" type="checkbox">
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <span>Short task goes here...</span>
-                                    <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                                </div>
-                            </div>
+                        <div class="d-flex flex-column mb-2">
+                            <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Purpose" name="name"><br>
+
+                            <input class="form-control bg-dark border-0" type="number" placeholder="Enter the Amount" min="0" name="amount"><br>
+
+                            <input class="form-control bg-dark border-0" type="date" placeholder="Enter the Date" name="date"><br>
+
+                            <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Description" name="detail"><br>
+
+                            <input class="form-control bg-dark border-0" type="text" placeholder="Enter the Note" name="note"><br>
+
+                            <input type="submit" class="btn btn-primary ms-2" value="Add" >
                         </div>
-                        <div class="d-flex align-items-center border-bottom py-2">
-                            <input class="form-check-input m-0" type="checkbox" checked>
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <span><del>Short task goes here...</del></span>
-                                    <button class="btn btn-sm text-primary"><i class="fa fa-times"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center border-bottom py-2">
-                            <input class="form-check-input m-0" type="checkbox">
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <span>Short task goes here...</span>
-                                    <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-center pt-2">
-                            <input class="form-check-input m-0" type="checkbox">
-                            <div class="w-100 ms-3">
-                                <div class="d-flex w-100 align-items-center justify-content-between">
-                                    <span>Short task goes here...</span>
-                                    <button class="btn btn-sm"><i class="fa fa-times"></i></button>
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -4,7 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.*;
 
-public class SavingDaoImpl implements SavingDao{
+public class SavingImpl implements SavingDao {
     JdbcTemplate jdbcTemplate = new JdbcTemplate();
     private final String url = "jdbc:postgresql://localhost:5432/PersonalFinance";
     private final String user = "sa";
