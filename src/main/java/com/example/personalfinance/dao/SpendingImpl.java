@@ -203,6 +203,24 @@ public class SpendingImpl implements SpendingDao
         }
     }
 
+    @Override
+    public List<Integer> getAvailableYear(int userId) {
+        List<Integer> yearList = new ArrayList<>();
+        String sql = "select distinct EXTRACT(YEAR FROM date_of_spending) as year from spending where account_id=?";
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                yearList.add(rs.getInt("year"));
+            }
+            conn.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return yearList;
+    }
+
     private class SpendingRowMapper implements RowMapper<Spending> {
         @Override
         public Spending mapRow(ResultSet rs, int rowNum) throws SQLException {

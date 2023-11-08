@@ -19,4 +19,6 @@ public interface SpendingDao{
     public Spending getSpendingInfo(int id, int accountId);
 
     public void realDelete(int userId, int id);
+
+    public List<Integer> getAvailableYear(int userId);
 }

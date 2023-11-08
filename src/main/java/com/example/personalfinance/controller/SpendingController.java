@@ -5,18 +5,17 @@ import com.example.personalfinance.dao.BudgetImpl;
 import com.example.personalfinance.dao.SavingImpl;
 import com.example.personalfinance.dao.SpendingImpl;
 import com.example.personalfinance.service.SpendingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpSession;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -24,16 +23,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Controller
-public class MenuController {
+public class SpendingController {
     private final SpendingService spendingService = new SpendingService();
     private final SpendingImpl spendingDao = new SpendingImpl();
     private final BudgetImpl budgetDao = new BudgetImpl();
     private final SavingImpl savingDao = new SavingImpl();
     private LocalDate localDate = LocalDate.now();
     private int m_budget = 0, m_spending= 0, saving= 0;
+    private List<Integer> yearList = new ArrayList<>();
 
     //For checking whether the update request is sent
-    private boolean isUpdate = false;
+    private boolean isUpdate = false, isSearch = false;
+    int searchMonth = localDate.getMonthValue(), searchYear = localDate.getYear();
     //Setting the id for the updated expense
     private int updateId=0;
     @GetMapping("/spending")
@@ -46,16 +47,17 @@ public class MenuController {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(5);
 
-        //Redirect if haven't logged in properly yet
+        //Redirect if user hasn't logged in properly yet
         if(uid==null) return "loginPage";
 
         //Getting the content for the expense list of the user
-        Page<Spending> spendingList = spendingService.findPaginated(PageRequest.of(currentPage - 1, pageSize), uid, localDate.getMonthValue(), localDate.getYear());
-
+        Page<Spending> spendingList = spendingService.findPaginated(PageRequest.of(currentPage - 1, pageSize), uid, searchMonth, searchYear);
+        isSearch = false;
         //Getting the content for the 4 charts
-        m_budget = budgetDao.getMonthBudget(uid, localDate.getMonthValue(), localDate.getYear());
-        m_spending = spendingDao.getMonthSpending(uid, localDate.getMonthValue(), localDate.getYear());
+        m_budget = budgetDao.getMonthBudget(uid, searchMonth, searchYear);
+        m_spending = spendingDao.getMonthSpending(uid, searchMonth, searchYear);
         saving = savingDao.getTotalSaving(uid);
+
 
         //Configure the contents to send to the view page
         model.addAttribute("m_budget", moneyconfig(m_budget));
@@ -65,13 +67,20 @@ public class MenuController {
         model.addAttribute("spendingList",spendingList);
         model.addAttribute("uname", uname);
 
-        //If the user want to update
+        //If the user want to update -> display the info of the requested expense
         if(isUpdate){
             Spending spending = spendingDao.getSpendingInfo(updateId, uid);
             model.addAttribute("spendingInfo", spending);
             isUpdate=false;
         }
 
+        //Sending out the available year data for user to choose from
+        yearList = spendingDao.getAvailableYear(uid);
+        model.addAttribute("yearList", yearList);
+        model.addAttribute("month", getMonthName(searchMonth));
+        model.addAttribute("monthValue", searchMonth);
+
+        //Setting for pagination
         int totalPages = spendingList.getTotalPages();
         if (totalPages > 0) {
             List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
@@ -79,6 +88,7 @@ public class MenuController {
                     .collect(Collectors.toList());
             model.addAttribute("pageNumbers", pageNumbers);
         }
+
         return "Testing";
     }
 
@@ -117,7 +127,6 @@ public class MenuController {
         if(!temp.equals(spending)){
             //Delete the expense from the database
             spendingDao.realDelete(uid, updateId);
-
             //Add a new expense with the value given as before
             spendingDao.addSpending(price, dateOfSpending, detail, name, note, uid);
         }else System.out.println("No change made!!!!!!!!!");
@@ -136,7 +145,7 @@ public class MenuController {
     @PostMapping("/spending/budget")
     public String setBudget(@RequestParam("budget") String budget,
                             @SessionAttribute("uid") int uid){
-        budgetDao.setBudget(uid, localDate.getMonthValue(), localDate.getYear(), Integer.parseInt(budget));
+        budgetDao.setBudget(uid, searchMonth, searchYear, Integer.parseInt(budget));
         return "redirect:/spending";
     }
 
@@ -189,9 +198,24 @@ public class MenuController {
         return "redirect:/spending";
     }
 
+    @PostMapping("/spending/search")
+    public String searchSpending(@RequestParam("month") int month,
+                                 @RequestParam("year") int year){
+        searchMonth = month;
+        searchYear = year;
+        isSearch = true;
+        return "redirect:/spending";
+    }
+
 
 
     public String moneyconfig(int number) {
+        boolean isNeg = false;
+        if(number<0){
+            number*=(-1);
+            isNeg = true;
+        }
+
         String old = "" + number;
         StringBuilder temp = new StringBuilder();
         int count = 0;
@@ -203,6 +227,7 @@ public class MenuController {
             }
             count++;
         }
+        if(isNeg) return "-" + reverseString(temp.toString()) + " VND";
         return reverseString(temp.toString()) + " VND";
     }
 
@@ -212,5 +237,21 @@ public class MenuController {
             a.append(temp.charAt(i));
         }
         return a.toString();
+    }
+
+    private String getMonthName(int searchMonth) {
+        switch(searchMonth){
+            case 1: return "January";
+            case 2: return "February";
+            case 3: return "March";
+            case 4: return "April";
+            case 5: return "May";
+            case 6: return "June";
+            case 7: return "July";
+            case 8: return "August";
+            case 9: return "September";
+            case 10: return "October";
+            case 11: return "November";
+        }return "December";
     }
 }
